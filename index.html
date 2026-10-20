@@ -192,6 +192,47 @@
   .listen:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
   .listen[hidden] { display: none; }
 
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .acciones:not(:has(:not([hidden]))) { display: none; }
+
+  .share {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--accent);
+    background: var(--chip);
+    border: none;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 999px;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .share:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .share:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .share[hidden] { display: none; }
+  .share.feedback { animation: pop 0.3s ease; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .btn {
     font-family: "Fredoka", "Quicksand", sans-serif;
     font-weight: 600;
@@ -235,8 +276,9 @@
     .song.show { animation: none; }
     .star { animation: none; }
     .disc { animation: none; }
-    .btn, .listen { transition: none; }
-    .btn:hover, .btn:active, .listen:hover { transform: none; }
+    .share.feedback { animation: none; }
+    .btn, .listen, .share { transition: none; }
+    .btn:hover, .btn:active, .listen:hover, .share:hover { transform: none; }
   }
 </style>
 </head>
@@ -255,8 +297,13 @@
         <span class="artist" id="artist"></span>
       </figcaption>
       <p class="nota" id="nota"></p>
-      <a class="listen" id="listen" target="_blank" rel="noopener noreferrer" hidden>▶ Escuchar</a>
+      <div class="acciones">
+        <a class="listen" id="listen" target="_blank" rel="noopener noreferrer" hidden>▶ Escuchar</a>
+        <button type="button" class="share" id="share" aria-label="Compartir enlace de la canción" hidden>🔗 Compartir</button>
+      </div>
     </figure>
+
+    <div class="sr-only" id="shareStatus" role="status" aria-live="polite"></div>
 
     <button class="btn" id="btn" type="button">Dedicame una 🎧</button>
 
@@ -305,12 +352,18 @@
   const artistEl = document.getElementById("artist");
   const notaEl = document.getElementById("nota");
   const listenEl = document.getElementById("listen");
+  const shareEl = document.getElementById("share");
+  const shareStatusEl = document.getElementById("shareStatus");
   const btn = document.getElementById("btn");
   const disc = document.getElementById("disc");
 
   greetingEl.textContent = NOMBRE.trim() ? "Hola, " + NOMBRE.trim() + " 👋" : "Hola 👋";
 
   let ultimoIndice = -1;
+  let cancionActual = null;
+  const TEXTO_SHARE = shareEl.textContent;
+  let shareTimer = null;
+  let anuncioTimer = null;
 
   function cancionAlAzar() {
     if (CANCIONES.length === 0) return null;
@@ -327,6 +380,7 @@
     const idx = cancionAlAzar();
     if (idx === null) return;
     const c = CANCIONES[idx];
+    cancionActual = c;
 
     fragmentEl.textContent = c.fragmento || "";
 
@@ -345,6 +399,9 @@
       listenEl.removeAttribute("href");
     }
 
+    resetShare();
+    shareEl.hidden = !(c.link && c.link.trim());
+
     disc.classList.add("playing");
 
     songEl.classList.remove("show");
@@ -352,6 +409,77 @@
     songEl.classList.add("show");
   }
 
+  function resetShare() {
+    clearTimeout(shareTimer);
+    clearTimeout(anuncioTimer);
+    shareTimer = null;
+    anuncioTimer = null;
+    shareEl.textContent = TEXTO_SHARE;
+    shareEl.classList.remove("feedback");
+    shareStatusEl.textContent = "";
+  }
+
+  function mostrarFeedback(texto) {
+    clearTimeout(shareTimer);
+    clearTimeout(anuncioTimer);
+    shareEl.textContent = texto;
+    shareEl.classList.remove("feedback");
+    void shareEl.offsetWidth;
+    shareEl.classList.add("feedback");
+    shareStatusEl.textContent = "";
+    // vaciar y volver a escribir para que se anuncie también en toques seguidos
+    anuncioTimer = setTimeout(() => { shareStatusEl.textContent = texto; }, 50);
+    shareTimer = setTimeout(resetShare, 2000);
+  }
+
+  function copiarConTextarea(texto) {
+    const ta = document.createElement("textarea");
+    ta.value = texto;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, texto.length);
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    shareEl.focus({ preventScroll: true });
+    return ok;
+  }
+
+  async function copiar(texto) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(texto);
+        return true;
+      } catch (e) { /* cae al fallback */ }
+    }
+    return copiarConTextarea(texto);
+  }
+
+  async function compartir() {
+    if (!cancionActual) return;
+    const link = (cancionActual.link || "").trim();
+    if (!link) return;
+
+    const esTactil = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+    if (navigator.share && esTactil) {
+      const titulo = [cancionActual.cancion, cancionActual.artista]
+        .filter((x) => x && x.trim()).join(" — ");
+      try {
+        await navigator.share({ title: titulo, text: cancionActual.fragmento || "", url: link });
+        return;
+      } catch (e) {
+        if (e && e.name === "AbortError") return;
+        // otro error: cae a copiar
+      }
+    }
+    mostrarFeedback((await copiar(link)) ? "¡Copiado! ✓" : "No se pudo copiar");
+  }
+
+  shareEl.addEventListener("click", compartir);
   btn.addEventListener("click", dedicar);
 
   // Estrellitas sutiles de fondo
