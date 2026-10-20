@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Un mensajito para vos</title>
+<title>Una canción para vos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,6 +25,7 @@
     --shadow: rgba(255, 138, 92, 0.28);
     --star: rgba(255, 170, 120, 0.55);
     --focus: #6c5ce7;
+    --chip: rgba(255, 138, 92, 0.14);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -42,6 +43,7 @@
       --shadow: rgba(0, 0, 0, 0.45);
       --star: rgba(255, 200, 160, 0.5);
       --focus: #b7a7ff;
+      --chip: rgba(255, 154, 108, 0.16);
     }
   }
 
@@ -87,9 +89,9 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 460px;
+    max-width: 480px;
     text-align: center;
-    padding: 40px 28px 44px;
+    padding: 36px 28px 40px;
     border-radius: 28px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -102,34 +104,93 @@
     font-family: "Fredoka", "Quicksand", sans-serif;
     font-weight: 600;
     font-size: clamp(1.3rem, 5vw, 1.7rem);
-    margin: 0 0 6px;
+    margin: 0 0 4px;
     color: var(--text);
   }
 
   .subtitle {
-    margin: 0 0 28px;
+    margin: 0 0 24px;
     font-size: 0.98rem;
     color: var(--text-soft);
     font-weight: 500;
   }
 
-  .message {
-    min-height: 110px;
+  /* Disco de vinilo */
+  .disc {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, var(--accent-2) 0 14%, transparent 15%),
+      repeating-radial-gradient(circle at 50% 50%, #0000 0 3px, rgba(0,0,0,0.12) 3px 4px),
+      linear-gradient(135deg, #2a2230, #43384a);
+    box-shadow: 0 10px 24px -10px var(--shadow), inset 0 0 0 2px rgba(255,255,255,0.06);
+    animation: spin 8s linear infinite;
+    animation-play-state: paused;
+  }
+  .disc.playing { animation-play-state: running; }
+  .disc::after {
+    content: "";
+    position: absolute;
+  }
+
+  .song {
+    margin: 0 0 26px;
+    min-height: 150px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 14px;
+  }
+
+  .song.show { animation: pop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+
+  .fragment {
     font-family: "Fredoka", "Quicksand", sans-serif;
     font-weight: 500;
-    font-size: clamp(1.15rem, 4.8vw, 1.5rem);
+    font-size: clamp(1.15rem, 4.6vw, 1.45rem);
     line-height: 1.45;
-    margin: 0 auto 30px;
+    margin: 0;
     max-width: 30ch;
     color: var(--text);
   }
 
-  .message.show {
-    animation: pop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-weight: 600;
   }
+  .meta .title { font-size: 1rem; color: var(--text); }
+  .meta .artist { font-size: 0.9rem; color: var(--text-soft); font-weight: 500; }
+
+  .nota {
+    margin: 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--text-soft);
+    max-width: 32ch;
+  }
+  .nota:empty { display: none; }
+
+  .listen {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--accent);
+    background: var(--chip);
+    padding: 8px 16px;
+    border-radius: 999px;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .listen:hover { transform: translateY(-1px); filter: brightness(1.08); }
+  .listen:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .listen[hidden] { display: none; }
 
   .btn {
     font-family: "Fredoka", "Quicksand", sans-serif;
@@ -146,24 +207,12 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .btn:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.05);
-    box-shadow: 0 18px 32px -10px var(--shadow);
-  }
-
-  .btn:active {
-    transform: translateY(1px) scale(0.98);
-    box-shadow: 0 8px 18px -8px var(--shadow);
-  }
-
-  .btn:focus-visible {
-    outline: 3px solid var(--focus);
-    outline-offset: 3px;
-  }
+  .btn:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 18px 32px -10px var(--shadow); }
+  .btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 8px 18px -8px var(--shadow); }
+  .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 
   .footer {
-    margin-top: 22px;
+    margin-top: 20px;
     font-size: 0.8rem;
     color: var(--text-soft);
     font-weight: 500;
@@ -175,19 +224,19 @@
     60%  { opacity: 1; transform: scale(1.02) translateY(0); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
   }
-
   @keyframes twinkle {
     0%, 100% { opacity: 0.25; transform: scale(0.85); }
     50%      { opacity: 0.9;  transform: scale(1.15); }
   }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Respeta a quien prefiere menos movimiento */
   @media (prefers-reduced-motion: reduce) {
-    .message.show { animation: none; }
+    .song.show { animation: none; }
     .star { animation: none; }
-    .btn { transition: none; }
-    .btn:hover { transform: none; }
-    .btn:active { transform: none; }
+    .disc { animation: none; }
+    .btn, .listen { transition: none; }
+    .btn:hover, .btn:active, .listen:hover { transform: none; }
   }
 </style>
 </head>
@@ -195,27 +244,52 @@
   <div class="stars" aria-hidden="true"></div>
 
   <main class="card">
+    <div class="disc" id="disc" aria-hidden="true"></div>
     <h1 class="greeting" id="greeting">Hola 👋</h1>
-    <p class="subtitle">Tocá el botón cuando quieras un mimo rápido</p>
+    <p class="subtitle">Tocá el botón y te dedico una canción</p>
 
-    <p class="message" id="message" aria-live="polite">Dale, tocá ahí abajo 👇</p>
+    <figure class="song" id="song" aria-live="polite">
+      <blockquote class="fragment" id="fragment">Dale, tocá ahí abajo 👇</blockquote>
+      <figcaption class="meta" id="meta" hidden>
+        <span class="title" id="title"></span>
+        <span class="artist" id="artist"></span>
+      </figcaption>
+      <p class="nota" id="nota"></p>
+      <a class="listen" id="listen" target="_blank" rel="noopener noreferrer" hidden>▶ Escuchar</a>
+    </figure>
 
-    <button class="btn" id="btn" type="button">Mostrame algo lindo ✨</button>
+    <button class="btn" id="btn" type="button">Dedicame una 🎧</button>
 
     <p class="footer">Hecho con cariño · sin compromiso</p>
   </main>
 
 <script>
-  // 👇 Editá o agregá tus mensajes y chistes internos acá
-  const MENSAJES = [
-    "Pará un segundo: te está yendo mejor de lo que pensás.",
-    "Dato random: caés bien apenas entrás a un lugar. Es injusto para el resto.",
-    "Si el día viene denso, respirá. Ya pasaste por peores y acá estás.",
-    "Alguien se acordó de vos hoy sin motivo. (Era yo, pero shh.)",
-    "Recordatorio: tu risa arregla cosas que ni sabías que estaban rotas.",
-    "Esto no quiere nada a cambio. Solo que sonrías un toque. Listo, misión cumplida.",
-    "Si llegaste hasta acá en la semana, ya ganaste. El resto es bonus.",
-    "Nota mental para vos: estás haciendo las cosas bien aunque no te lo digas.",
+  // 👇 Editá o agregá tus canciones acá.
+  //    En "fragmento" pegá EL VERSO que elegiste vos (tu parte favorita).
+  //    "link" puede ser de Spotify, YouTube, Apple Music, lo que quieras (dejalo "" si no querés botón).
+  //    "nota" es opcional: tu mensajito ("escuchá el 2:14", "me acordé de vos acá", etc.).
+  const CANCIONES = [
+    {
+      fragmento: "«Acá va el verso que elegiste de la canción»",
+      cancion: "Nombre de la canción",
+      artista: "Artista",
+      link: "https://open.spotify.com/",
+      nota: "Escuchá bien el estribillo 💭",
+    },
+    {
+      fragmento: "«Otro versito que te haga acordar a ella»",
+      cancion: "Otra canción",
+      artista: "Otro artista",
+      link: "https://youtube.com/",
+      nota: "",
+    },
+    {
+      fragmento: "«Y otro más para cuando el día venga denso»",
+      cancion: "Tercera canción",
+      artista: "Artista",
+      link: "",
+      nota: "Esta me la sé de memoria.",
+    },
   ];
 
   // Dejá vacío ("") para un saludo neutro, o poné un nombre: const NOMBRE = "Sofi";
@@ -224,39 +298,67 @@
   // ---- De acá para abajo no hace falta tocar nada ----
 
   const greetingEl = document.getElementById("greeting");
-  const messageEl = document.getElementById("message");
+  const songEl = document.getElementById("song");
+  const fragmentEl = document.getElementById("fragment");
+  const metaEl = document.getElementById("meta");
+  const titleEl = document.getElementById("title");
+  const artistEl = document.getElementById("artist");
+  const notaEl = document.getElementById("nota");
+  const listenEl = document.getElementById("listen");
   const btn = document.getElementById("btn");
+  const disc = document.getElementById("disc");
 
   greetingEl.textContent = NOMBRE.trim() ? "Hola, " + NOMBRE.trim() + " 👋" : "Hola 👋";
 
   let ultimoIndice = -1;
 
-  function mensajeAlAzar() {
-    if (MENSAJES.length === 0) return "";
-    if (MENSAJES.length === 1) return MENSAJES[0];
+  function cancionAlAzar() {
+    if (CANCIONES.length === 0) return null;
+    if (CANCIONES.length === 1) return 0;
     let i;
     do {
-      i = Math.floor(Math.random() * MENSAJES.length);
+      i = Math.floor(Math.random() * CANCIONES.length);
     } while (i === ultimoIndice);
     ultimoIndice = i;
-    return MENSAJES[i];
+    return i;
   }
 
-  function mostrarMensaje() {
-    messageEl.textContent = mensajeAlAzar();
-    messageEl.classList.remove("show");
-    // Forzar reflow para reiniciar la animación en toques seguidos
-    void messageEl.offsetWidth;
-    messageEl.classList.add("show");
+  function dedicar() {
+    const idx = cancionAlAzar();
+    if (idx === null) return;
+    const c = CANCIONES[idx];
+
+    fragmentEl.textContent = c.fragmento || "";
+
+    const tieneMeta = (c.cancion && c.cancion.trim()) || (c.artista && c.artista.trim());
+    metaEl.hidden = !tieneMeta;
+    titleEl.textContent = c.cancion || "";
+    artistEl.textContent = c.artista || "";
+
+    notaEl.textContent = c.nota || "";
+
+    if (c.link && c.link.trim()) {
+      listenEl.href = c.link.trim();
+      listenEl.hidden = false;
+    } else {
+      listenEl.hidden = true;
+      listenEl.removeAttribute("href");
+    }
+
+    disc.classList.add("playing");
+
+    songEl.classList.remove("show");
+    void songEl.offsetWidth; // reinicia la animación en toques seguidos
+    songEl.classList.add("show");
   }
 
-  btn.addEventListener("click", mostrarMensaje);
+  btn.addEventListener("click", dedicar);
 
   // Estrellitas sutiles de fondo
   (function crearEstrellas() {
     const cont = document.querySelector(".stars");
-    const simbolos = ["✦", "✧", "✵", "·"];
-    const total = 26;
+    const simbolos = ["✦", "✧", "♪", "·"];
+    const total = 24;
     for (let n = 0; n < total; n++) {
       const s = document.createElement("span");
       s.className = "star";
