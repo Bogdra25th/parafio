@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Un mensajito para vos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+
+    /* Paleta clara (cálida) */
+    --bg-1: #fff4ec;
+    --bg-2: #ffe3d3;
+    --bg-3: #ffdce6;
+    --card-bg: rgba(255, 255, 255, 0.72);
+    --card-border: rgba(255, 255, 255, 0.9);
+    --text: #4a3b42;
+    --text-soft: #8a7079;
+    --accent: #ff8a5c;
+    --accent-2: #ff6f91;
+    --accent-ink: #ffffff;
+    --shadow: rgba(255, 138, 92, 0.28);
+    --star: rgba(255, 170, 120, 0.55);
+    --focus: #6c5ce7;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-1: #241824;
+      --bg-2: #2d1b2e;
+      --bg-3: #1c1626;
+      --card-bg: rgba(48, 34, 52, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f3e9ee;
+      --text-soft: #c2a9b6;
+      --accent: #ff9a6c;
+      --accent-2: #ff7fa4;
+      --accent-ink: #2a1720;
+      --shadow: rgba(0, 0, 0, 0.45);
+      --star: rgba(255, 200, 160, 0.5);
+      --focus: #b7a7ff;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    font-family: "Quicksand", system-ui, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, var(--bg-2), transparent 60%),
+      radial-gradient(1000px 500px at 110% 20%, var(--bg-3), transparent 55%),
+      linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    background-attachment: fixed;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Estrellitas / destellos sutiles */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    color: var(--star);
+    font-size: 14px;
+    opacity: 0.7;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+    padding: 40px 28px 44px;
+    border-radius: 28px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 24px 60px -20px var(--shadow);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .greeting {
+    font-family: "Fredoka", "Quicksand", sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.3rem, 5vw, 1.7rem);
+    margin: 0 0 6px;
+    color: var(--text);
+  }
+
+  .subtitle {
+    margin: 0 0 28px;
+    font-size: 0.98rem;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+
+  .message {
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Fredoka", "Quicksand", sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.15rem, 4.8vw, 1.5rem);
+    line-height: 1.45;
+    margin: 0 auto 30px;
+    max-width: 30ch;
+    color: var(--text);
+  }
+
+  .message.show {
+    animation: pop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+
+  .btn {
+    font-family: "Fredoka", "Quicksand", sans-serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--accent-ink);
+    border: none;
+    cursor: pointer;
+    padding: 16px 34px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 12px 26px -8px var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 18px 32px -10px var(--shadow);
+  }
+
+  .btn:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 8px 18px -8px var(--shadow);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .footer {
+    margin-top: 22px;
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    font-weight: 500;
+    opacity: 0.85;
+  }
+
+  @keyframes pop {
+    0%   { opacity: 0; transform: scale(0.96) translateY(6px); }
+    60%  { opacity: 1; transform: scale(1.02) translateY(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.85); }
+    50%      { opacity: 0.9;  transform: scale(1.15); }
+  }
+
+  /* Respeta a quien prefiere menos movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    .message.show { animation: none; }
+    .star { animation: none; }
+    .btn { transition: none; }
+    .btn:hover { transform: none; }
+    .btn:active { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <main class="card">
+    <h1 class="greeting" id="greeting">Hola 👋</h1>
+    <p class="subtitle">Tocá el botón cuando quieras un mimo rápido</p>
+
+    <p class="message" id="message" aria-live="polite">Dale, tocá ahí abajo 👇</p>
+
+    <button class="btn" id="btn" type="button">Mostrame algo lindo ✨</button>
+
+    <p class="footer">Hecho con cariño · sin compromiso</p>
+  </main>
+
+<script>
+  // 👇 Editá o agregá tus mensajes y chistes internos acá
+  const MENSAJES = [
+    "Pará un segundo: te está yendo mejor de lo que pensás.",
+    "Dato random: caés bien apenas entrás a un lugar. Es injusto para el resto.",
+    "Si el día viene denso, respirá. Ya pasaste por peores y acá estás.",
+    "Alguien se acordó de vos hoy sin motivo. (Era yo, pero shh.)",
+    "Recordatorio: tu risa arregla cosas que ni sabías que estaban rotas.",
+    "Esto no quiere nada a cambio. Solo que sonrías un toque. Listo, misión cumplida.",
+    "Si llegaste hasta acá en la semana, ya ganaste. El resto es bonus.",
+    "Nota mental para vos: estás haciendo las cosas bien aunque no te lo digas.",
+  ];
+
+  // Dejá vacío ("") para un saludo neutro, o poné un nombre: const NOMBRE = "Sofi";
+  const NOMBRE = "";
+
+  // ---- De acá para abajo no hace falta tocar nada ----
+
+  const greetingEl = document.getElementById("greeting");
+  const messageEl = document.getElementById("message");
+  const btn = document.getElementById("btn");
+
+  greetingEl.textContent = NOMBRE.trim() ? "Hola, " + NOMBRE.trim() + " 👋" : "Hola 👋";
+
+  let ultimoIndice = -1;
+
+  function mensajeAlAzar() {
+    if (MENSAJES.length === 0) return "";
+    if (MENSAJES.length === 1) return MENSAJES[0];
+    let i;
+    do {
+      i = Math.floor(Math.random() * MENSAJES.length);
+    } while (i === ultimoIndice);
+    ultimoIndice = i;
+    return MENSAJES[i];
+  }
+
+  function mostrarMensaje() {
+    messageEl.textContent = mensajeAlAzar();
+    messageEl.classList.remove("show");
+    // Forzar reflow para reiniciar la animación en toques seguidos
+    void messageEl.offsetWidth;
+    messageEl.classList.add("show");
+  }
+
+  btn.addEventListener("click", mostrarMensaje);
+
+  // Estrellitas sutiles de fondo
+  (function crearEstrellas() {
+    const cont = document.querySelector(".stars");
+    const simbolos = ["✦", "✧", "✵", "·"];
+    const total = 26;
+    for (let n = 0; n < total; n++) {
+      const s = document.createElement("span");
+      s.className = "star";
+      s.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+      s.style.left = Math.random() * 100 + "%";
+      s.style.top = Math.random() * 100 + "%";
+      s.style.fontSize = (10 + Math.random() * 12) + "px";
+      s.style.animationDelay = (Math.random() * 4) + "s";
+      s.style.animationDuration = (3 + Math.random() * 3) + "s";
+      cont.appendChild(s);
+    }
+  })();
+</script>
+</body>
+</html>
