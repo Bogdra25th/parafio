@@ -299,11 +299,11 @@
   <main class="card">
     <p class="brand">Detallito para mi &lt;3</p>
     <div class="disc" id="disc" aria-hidden="true"></div>
-    <h1 class="greeting" id="greeting">Hola 👋</h1>
-    <p class="subtitle">Tocá el botón y te dedico una canción</p>
+    <h1 class="greeting" id="greeting">Hola Fio</h1>
+    <p class="subtitle">Tocá el botón y vas a ver algunas músicas que te dedico</p>
 
     <figure class="song" id="song" aria-live="polite">
-      <blockquote class="fragment" id="fragment">Dale, tocá ahí abajo 👇</blockquote>
+      <blockquote class="fragment" id="fragment">Acá abajo 👇</blockquote>
       <figcaption class="meta" id="meta" hidden>
         <span class="title" id="title"></span>
         <span class="artist" id="artist"></span>
@@ -317,9 +317,7 @@
 
     <div class="sr-only" id="shareStatus" role="status" aria-live="polite"></div>
 
-    <button class="btn" id="btn" type="button">Dedicame una 🎧</button>
-
-    <p class="footer">Hecho con cariño · sin compromiso</p>
+    <button class="btn" id="btn" type="button" aria-label="Dedicame una canción">🎧</button>
   </main>
 
 <script>
@@ -352,7 +350,7 @@
   ];
 
   // Dejá vacío ("") para un saludo neutro, o poné un nombre: const NOMBRE = "Sofi";
-  const NOMBRE = "";
+  const NOMBRE = "Fio";
 
   // ---- De acá para abajo no hace falta tocar nada ----
 
@@ -369,7 +367,7 @@
   const btn = document.getElementById("btn");
   const disc = document.getElementById("disc");
 
-  greetingEl.textContent = NOMBRE.trim() ? "Hola, " + NOMBRE.trim() + " 👋" : "Hola 👋";
+  greetingEl.textContent = NOMBRE.trim() ? "Hola " + NOMBRE.trim() : "Hola";
 
   let ultimoIndice = -1;
   let cancionActual = null;
